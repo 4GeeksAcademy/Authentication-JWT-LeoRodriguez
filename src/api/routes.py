@@ -20,9 +20,30 @@ CORS(api)
 def create_token():
     email = request.json.get("email", None)
     password = request.json.get("password", None)
-    if email != "test" or password != "test":
-        return jsonify({"msg": "Bad username or password"}), 401
+    access_token = create_access_token(identity=email)
+    return jsonify(access_token=access_token)
 
-    else:
+@api.route("/login", methods=["POST"])
+def recreate_token():
+    email = request.json.get("email", None)
+    password = request.json.get("password", None)
+    
+    # Verificar si el usuario existe y las credenciales son correctas
+    user = User.query.filter_by(email=email, password=password).first()
+    if user:
         access_token = create_access_token(identity=email)
         return jsonify(access_token=access_token)
+    else:
+        return jsonify({"msg": "Invalid credentials"}), 401
+
+
+@api.route("/hello", methods=["GET"])
+@jwt_required()
+def get_hello():
+        email = get_jwt_identity()
+        dictionary = {
+             "message": "Hello World " + email
+        }
+
+        return jsonify(dictionary)
+

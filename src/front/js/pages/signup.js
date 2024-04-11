@@ -11,13 +11,13 @@ export const Signup = () => {
     console.log("This is your token", store.token);
 
     const handleClick = () =>{
-        actions.login(email, password);
+        actions.signup(email, password);
     };
     
     const navigate = useNavigate();
 
     if(store.token && store.token != "" && store.token!= undefined) {
-        navigate('/home');
+        navigate('/');
         return true; // Indica que se redirigió exitosamente
     }
     

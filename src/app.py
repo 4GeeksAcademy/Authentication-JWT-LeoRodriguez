@@ -25,16 +25,14 @@ app.config["JWT_SECRET_KEY"] = "n12ip34j2180enrhd13nd31i0ndb13"  # Change this!
 jwt = JWTManager(app)
 CORS(app)
 # database condiguration
-db_url = os.getenv("DATABASE_URL")
-if db_url is not None:
-    app.config['SQLALCHEMY_DATABASE_URI'] = db_url.replace(
-        "postgres://", "postgresql://")
-else:
-    app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:////tmp/test.db"
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 MIGRATE = Migrate(app, db, compare_type=True)
 db.init_app(app)
+
+with app.app_context():
+    db.create_all()
 
 # add the admin
 setup_admin(app)

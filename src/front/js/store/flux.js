@@ -26,7 +26,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 				console.log("Application is loaded synching the session storage token.")
 				if (token && token != "" && token!= undefined ) setStore({ token: token});
 			},
-			login: async (email, password) =>{
+			signup: async (email, password) =>{
 				const opts = {
 					method: 'POST',
 					headers: {
@@ -54,10 +54,50 @@ const getState = ({ getStore, getActions, setStore }) => {
 				console.log("there has been an error", error)
 			}
 			},
+			login: async (email, password) =>{
+				const opts = {
+					method: 'POST',
+					headers: {
+						"Content-Type": "application/json"
+					},
+					body: JSON.stringify({
+						"email": email,
+						"password": password
+					})
+				};
+				try{
+					const resp = await fetch('https://automatic-halibut-9r9wwvqrvwx2x6r-3001.app.github.dev/api/login', opts)
+					if(resp.status !== 200){
+					alert("There has been an error.");
+					return false
+				}
+				
+				const data = await resp.json();
+				console.log("this came from the backend", data);
+				sessionStorage.setItem("token", data.access_token);
+				setStore({token: data.access_token})
+				return true
+				}
+			catch(error){
+				console.log("there has been an error", error)
+			}
+			},
 			logout: () => {
 				sessionStorage.removeItem("token");
 				console.log("Login Out");
 				setStore({token: null});
+			},
+			getMessage: () =>{
+				const store = getStore();
+				const opts = {
+					headers: {
+						Authorization: "Bearer " + store.token
+					}
+				};
+			fetch('https://automatic-halibut-9r9wwvqrvwx2x6r-3001.app.github.dev/api/hello', opts)
+				.then(resp => resp.json())
+				.then(data => setStore({message: data.message}))
+				.catch(error => console.log("There has been an error", error))
 			},
 			changeColor: (index, color) => {
 				//get the store

@@ -13,35 +13,13 @@ export const Login = () => {
     const navigate = useNavigate()
 
     const logInUser = (event) => {
-        const token = localStorage.getItem('jwt-token');
-        const opts = {
-            method: 'POST',
-            body: JSON.stringify({
-                email: email,
-                password: password,
-            }),
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + sessionStorage.getItem("jwt-token")
-            }
-        }
+        actions.login(email, password);
+    };
+    
 
-
-        fetch('https://refactored-cod-5wp7qrpv965c6j6-3001.app.github.dev/api/token', opts)
-            .then(res => res.json())
-            .then(data => {
-                if (!data.access_token) {
-                    setError("wrong info")
-                }
-                else {
-                    sessionStorage.setItem("jwt-token", data.access_token)
-                    navigate("/home")
-                    setError("")
-                }
-
-
-            })
-
+    if(store.token && store.token != "" && store.token!= undefined) {
+        navigate('/');
+        return true; // Indica que se redirigió exitosamente
     }
 
     return (

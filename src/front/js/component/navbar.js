@@ -13,14 +13,9 @@ export const Navbar = () => {
 					</Link>
 				</div>
 				<div className="ml-auto">
-					<Link to="/">
-						<button className="navbar-brand mb-0 h1">login</button>
-					</Link>
-				</div>
-				<div className="ml-auto">
 					{!store.token ?
-						<Link to="/signup">
-							<button className="navbar-brand mb-0 h1">Please log in </button>
+						<Link to="/login">
+							<button className="navbar-brand mb-0 h1">Login</button>
 						</Link> 
 						:
 							<button onClick={() => actions.logout()} className="navbar-brand mb-0 h1">Log out</button>
