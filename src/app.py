@@ -6,12 +6,12 @@ from flask import Flask, request, jsonify, url_for, send_from_directory
 from flask_migrate import Migrate
 from flask_swagger import swagger
 from api.utils import APIException, generate_sitemap
-from flask_cors import CORS
-from api.models import db
-from api.routes import auth_routes
+from api.models import db, User
+from api.routes import api
 from api.admin import setup_admin
 from api.commands import setup_commands
-from flask_jwt_extended import JWTManager
+from flask_jwt_extended import JWTManager , jwt_required, get_jwt_identity
+from flask_cors import CORS
 
 # from models import Person
 
@@ -19,11 +19,11 @@ ENV = "development" if os.getenv("FLASK_DEBUG") == "1" else "production"
 static_file_dir = os.path.join(os.path.dirname(
     os.path.realpath(__file__)), '../public/')
 app = Flask(__name__)
-CORS(app)
 app.url_map.strict_slashes = False
-app.config["JWT_SECRET_KEY"] = "blahblahhello123"
-jwt = JWTManager(app)
 
+app.config["JWT_SECRET_KEY"] = "n12ip34j2180enrhd13nd31i0ndb13"  # Change this!
+jwt = JWTManager(app)
+CORS(app)
 # database condiguration
 db_url = os.getenv("DATABASE_URL")
 if db_url is not None:
@@ -43,7 +43,7 @@ setup_admin(app)
 setup_commands(app)
 
 # Add all endpoints form the API with a "api" prefix
-app.register_blueprint(auth_routes)
+app.register_blueprint(api, url_prefix='/api')
 
 # Handle/serialize errors like a JSON object
 
@@ -72,6 +72,42 @@ def serve_any_other_file(path):
     response.cache_control.max_age = 0  # avoid cache memory
     return response
 
+
+@app.route('/login', methods=['POST'])
+def login():
+    new_user = request.json
+
+
+    user =  User.query.filter_by(email=new_user["email"]).first()
+    print("USER")
+    print(user)
+    if user.password == new_user["password"]:
+    
+        return jsonify(user.serialize()), 200
+
+    else :
+        
+        return "password does not match" , 400
+    
+@app.route('/signup', methods=['POST'])
+def create_user():
+    new_user = request.json
+    user = User(email =new_user['email'], password =new_user['password'])
+    db.session.add(user)
+    db.session.commit() 
+
+    all_user = User.query.all()
+    response_body = list(map(lambda x: x.serialize(), all_user))
+    return jsonify(response_body), 200
+
+@app.route("/protected", methods=["GET"])
+@jwt_required()
+def protected():
+    # Access the identity of the current user with get_jwt_identity
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
+    
+    return jsonify({"id": user.id, "username": user.username }), 200
 
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':
