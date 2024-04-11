@@ -18,7 +18,7 @@ export const Navbar = () => {
 					</Link>
 				</div>
 				<div className="ml-auto">
-					{!store ?
+					{!store.token ?
 						<Link to="/signup">
 							<button className="navbar-brand mb-0 h1">Please log in </button>
 						</Link> 
