@@ -8,7 +8,7 @@ from flask_swagger import swagger
 from api.utils import APIException, generate_sitemap
 from flask_cors import CORS
 from api.models import db
-from api.routes import api
+from api.routes import auth_routes
 from api.admin import setup_admin
 from api.commands import setup_commands
 from flask_jwt_extended import JWTManager
@@ -19,7 +19,7 @@ ENV = "development" if os.getenv("FLASK_DEBUG") == "1" else "production"
 static_file_dir = os.path.join(os.path.dirname(
     os.path.realpath(__file__)), '../public/')
 app = Flask(__name__)
-CORS(api)
+CORS(app)
 app.url_map.strict_slashes = False
 app.config["JWT_SECRET_KEY"] = "blahblahhello123"
 jwt = JWTManager(app)
@@ -43,7 +43,7 @@ setup_admin(app)
 setup_commands(app)
 
 # Add all endpoints form the API with a "api" prefix
-app.register_blueprint(api, url_prefix='/api')
+app.register_blueprint(auth_routes)
 
 # Handle/serialize errors like a JSON object
 
