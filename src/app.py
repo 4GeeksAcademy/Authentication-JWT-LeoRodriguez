@@ -12,6 +12,8 @@ from api.admin import setup_admin
 from api.commands import setup_commands
 from flask_jwt_extended import JWTManager , jwt_required, get_jwt_identity
 from flask_cors import CORS
+from flask_sqlalchemy import SQLAlchemy
+from api.models import User
 
 # from models import Person
 
@@ -25,8 +27,7 @@ app.config["JWT_SECRET_KEY"] = "n12ip34j2180enrhd13nd31i0ndb13"  # Change this!
 jwt = JWTManager(app)
 CORS(app)
 # database condiguration
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
-
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////test.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 MIGRATE = Migrate(app, db, compare_type=True)
 db.init_app(app)

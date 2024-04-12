@@ -35,7 +35,22 @@ def recreate_token():
         return jsonify(access_token=access_token)
     else:
         return jsonify({"msg": "Invalid credentials"}), 401
+    
+@api.route('/user', methods=['POST'])
+def add_user():
+    email = request.json.get("email", None)
+    password = request.json.get("password", None)# Obtiene los datos enviados en el cuerpo de la solicitud en formato JSON   
+    new_user = email(email='email')
+    db.session.add(new_user)
+    db.session.commit()
+    
+    return jsonify({'message': 'Usuario agregado exitosamente', 'user_id': new_user.id}), 201
 
+    
+@api.route('/users')
+def get_users():
+    users = User.query.all()
+    return jsonify([user.serialize() for user in users])
 
 @api.route("/hello", methods=["GET"])
 @jwt_required()
